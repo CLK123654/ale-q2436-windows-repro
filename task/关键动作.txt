@@ -1,0 +1,7 @@
+核对input_data/下四个文件的相对路径、事件表头、sequence连续性、event_id唯一性、终态与策略字段。
+解析starter/broken_moderation_feed.py，确认待修复缺陷是连续失败阈值被禁用且原任务图仍完整。
+把修复后的DAG写入output/dags/moderation_feed_publish_guard.py，使调度属性、任务边和阈值与pause_policy.json一致。
+将每个DAGRUN事件作为manual且external_trigger=true的真实DagRun写入隔离元数据库，保留logical_date和终态。
+调用Airflow连续失败检查处理failed运行，通过DagModel.set_is_paused(false)执行管理员解封并保留全部运行历史。
+查询DagRun历史后缀、DagModel暂停开关和Log表paused行，按事件前后状态推导连续失败数、日志增量与verdict。
+在临时结果目录完成交叉核对后发布六份结果，并用另一空元数据库按结构化主键和值复核。

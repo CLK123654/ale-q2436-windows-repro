@@ -1,0 +1,17 @@
+内容平台每天通过moderation_feed_publish_guard向在线服务发布审核结果。
+
+input_data/starter/broken_moderation_feed.py把连续失败阈值设成0，保护逻辑因此失效。
+
+请以这个文件为缺陷起点，在output/dags/moderation_feed_publish_guard.py提交修复版，不得覆盖或移动输入。
+
+修复版保留@daily、catchup=false、max_active_runs=1、初始未暂停以及collect_review_decisions到verify_policy_coverage再到publish_moderation_feed的任务链。
+
+pause_policy.json是本次演练的配置依据，当前max_consecutive_failed_dag_runs为3。
+
+该值须在DAG对象、DagModel和SerializedDAG中与策略一致，评分按策略字段比对，不把数字3当作脱离输入的实现常量。
+
+incident_timeline.csv按sequence给出12个manual DagRun和2次管理员解封；
+
+DagRun保留输入中的run_id、logical_date和终态，external_trigger为true。
+
+请在Airflow中加载DAG并运行与本题有关的任务语义，交付DAG、必要的辅助模块和结果说明。

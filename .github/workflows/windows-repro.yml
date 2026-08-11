@@ -1,0 +1,40 @@
+name: q2436-windows-repro
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    runs-on: windows-2025
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - name: Run Airflow in WSL2
+        shell: pwsh
+        run: |
+          wsl.exe --version
+          wsl.exe --install --distribution Ubuntu-24.04 --no-launch --web-download
+          wsl.exe --distribution Ubuntu-24.04 --user root -- bash -lc "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3-venv unzip"
+          wsl.exe --distribution Ubuntu-24.04 --user root -- bash -lc "python3 -m venv /root/airflow && source /root/airflow/bin/activate && pip install apache-airflow==2.10.5 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.10.5/constraints-3.12.txt && airflow version"
+      - name: Verify four attachments and two clean directories
+        shell: pwsh
+        run: python ./qa/verify_attachments.py
+      - name: Execute primary software smoke
+        if: ${{ always() }}
+        shell: pwsh
+        run: ./qa/software_smoke.ps1
+      - name: Upload independent evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: q2436-windows-evidence
+          path: evidence/**
+          if-no-files-found: error

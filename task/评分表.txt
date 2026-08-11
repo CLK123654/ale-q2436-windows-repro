@@ -1,0 +1,25 @@
+总分100分。
+
+1.输入路径与交付边界（10分）
+满分条件：输入压缩包根目录为input_data/，且只含README.md、incident_timeline.csv、pause_policy.json、starter/broken_moderation_feed.py；待修复源明确为input_data/starter/broken_moderation_feed.py，成品明确为output/dags/moderation_feed_publish_guard.py。输入校验失败时返回非零，output/results不出现新结果。
+
+2.策略绑定与DAG修复（15分）
+满分条件：DagBag解析无错误；DAG对象、DagModel和SerializedDAG的max_consecutive_failed_dag_runs均等于pause_policy.json对应字段，本题输入下为3。schedule=@daily、catchup=false、max_active_runs=1、is_paused_upon_creation=false，三项任务与两条依赖边和策略一致。
+
+3.真实DagRun账簿（14分）
+满分条件：元数据库和dagrun_history.csv均有12个输入DAGRUN事件，run_id与logical_date逐键一致，按logical_date升序；4个success、8个failed，run_type均为manual且external_trigger均为true。没有额外运行，管理员事件不生成DagRun。
+
+4.连续失败暂停与真实审计（16分）
+满分条件：按logical_date倒序查询连续失败后缀；R05、R06、R07后的值依次为1、2、3，R07后is_paused=true且pause_event_delta=1。pause_log.csv的对应行来自Log表，event=paused、dag_id=moderation_feed_publish_guard、owner=scheduler、owner_display_name=Scheduler，extra与Airflow方法写入值一致；实现和README均不声称启动了Scheduler进程。
+
+5.解封后历史保留与再暂停（13分）
+满分条件：U01调用DagModel.set_is_paused(false)，处理后trailing_failures=3、is_paused=false、pause_event_delta=0；R08写入failed后trailing_failures=4、is_paused=true、pause_event_delta=1。两次暂停对应两条不同Log行，R05至R07未被删除、clear或改写。
+
+6.成功运行切断失败后缀（10分）
+满分条件：U02仅解除暂停并保留4个连续失败；R09success后后缀归零。R10、R11后分别为1、2且保持未暂停，R12success后再次归零，最终DagModel.is_paused=false。
+
+7.六份结果的交叉一致性（14分）
+满分条件：results只含题面指定的六个文件。event_ledger.csv有14行并逐项保留输入中的sequence、event_type、event_id、logical_date、run_state和operator_note；trailing_failures、is_paused、pause_event_delta、verdict可由输入和Airflow状态重新推导。validation.json含非空checks且全部为true，controls与三张CSV、两个JSON快照一致。
+
+8.独立复演与测试（8分）
+满分条件：两个新建AIRFLOW_HOME分别完成db migrate、事件重放和结果测试，输入文件保持不变；两次结果按event_id、run_id、ordinal及JSON业务字段一致。测试从输入与当前结果推导轨迹，覆盖策略绑定、真实运行、暂停日志和最终状态，且全部通过。
