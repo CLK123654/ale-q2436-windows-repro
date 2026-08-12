@@ -1,0 +1,7 @@
+#内容审核Feed连续失败保护交接
+
+暂停策略来自发布保障组提供的pause_policy.json。修复后的DAG位于dags/moderation_feed_publish_guard.py，审计入口位于tools/audit_release.py。
+
+results目录记录逐事件暂停状态、DagRun历史、最终DAG状态和Airflow暂停事件。发布前需要确认解封操作没有清除失败历史，并核对最后一次成功运行后连续失败数已经归零。
+
+本交付物在Windows11主机的WSL2环境中运行ApacheAirflow，不属于原生Windows运行。

@@ -1,17 +1,7 @@
-内容平台每天通过moderation_feed_publish_guard向在线服务发布审核结果。
+内容平台每天通过moderation_feed_publish_guard发布审核结果。最近一次脚本调整关闭了连续失败保护，发布保障组需要在下个发布窗口前恢复这项控制，并核对两次管理员解封是否保留了失败历史。
 
-input_data/starter/broken_moderation_feed.py把连续失败阈值设成0，保护逻辑因此失效。
+请使用输入包中的暂停策略、历史运行时间线和当前DAG完成交接。先恢复DAG的失败阈值，保留原有调度方式和任务关系；再把时间线中的运行写入新的Airflow元数据库，按顺序记录自动暂停、管理员解封和后续成功运行带来的状态变化。
 
-请以这个文件为缺陷起点，在output/dags/moderation_feed_publish_guard.py提交修复版，不得覆盖或移动输入。
+审计材料应能说明每个事件后的连续失败数和暂停状态，运行历史必须与输入一致。若某次解封后没有成功运行，下一次失败仍应沿用此前的失败后缀。成功运行出现后，连续失败数重新开始计算。
 
-修复版保留@daily、catchup=false、max_active_runs=1、初始未暂停以及collect_review_decisions到verify_policy_coverage再到publish_moderation_feed的任务链。
-
-pause_policy.json是本次演练的配置依据，当前max_consecutive_failed_dag_runs为3。
-
-该值须在DAG对象、DagModel和SerializedDAG中与策略一致，评分按策略字段比对，不把数字3当作脱离输入的实现常量。
-
-incident_timeline.csv按sequence给出12个manual DagRun和2次管理员解封；
-
-DagRun保留输入中的run_id、logical_date和终态，external_trigger为true。
-
-请在Airflow中加载DAG并运行与本题有关的任务语义，交付DAG、必要的辅助模块和结果说明。
+交付output目录，其中dags保存修复后的DAG，tools保存审计入口，results保存事件台账、DagRun历史、DAG状态和暂停记录，HANDOVER.md说明发布前的核对结果。

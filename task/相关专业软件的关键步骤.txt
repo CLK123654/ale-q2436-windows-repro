@@ -1,8 +1,6 @@
-1.读取input_data/pause_policy.json与incident_timeline.csv，核对策略字段、任务图、事件顺序、业务键、时间和终态。
-2.用DagBag解析input_data/starter/broken_moderation_feed.py，确认任务链完整且max_consecutive_failed_dag_runs为0。
-3.在output/dags/moderation_feed_publish_guard.py修复DAG，再用DagBag核对阈值等于策略字段并检查调度属性和两条依赖边。
-4.为本次复演创建空AIRFLOW_HOME并执行airflow db migrate，通过DAG.bulk_write_to_db同步DagModel。
-5.按sequence写入manual DagRun；failed运行调用DagRun._check_last_n_dagruns_failed，ADMIN_UNPAUSE调用DagModel.set_is_paused(false)。
-6.每个事件处理后刷新ORM会话，按logical_date倒序查询连续失败后缀，读取DagModel.is_paused并统计新增paused日志。
-7.从DagRun、DagModel、Log和SerializedDAG导出六份results文件，检查事件投影、策略绑定、状态轨迹与日志字段。
-8.在另一个空AIRFLOW_HOME重复迁移和重放，按event_id、run_id、ordinal及JSON字段比较结果，并运行output/tests/test_results.py。
+1.使用DagBag加载当前DAG，核对dag_id、调度方式、并发限制和任务依赖。
+2.按pause_policy.json恢复max_consecutive_failed_dag_runs，并再次用DagBag确认配置。
+3.设置新的AIRFLOW_HOME，执行airflow db migrate，再将修复版DAG同步到元数据库。
+4.按sequence创建manual DagRun并写入输入终态，管理员事件只更新DagModel的暂停开关。
+5.每个运行状态确定后调用DagRun.update_state，让Airflow执行连续失败判断，再查询DagModel和Log记录状态变化。
+6.导出event_ledger.csv、dagrun_history.csv、dag_snapshot.json和pause_events.csv，并生成HANDOVER.md。

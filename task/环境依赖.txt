@@ -1,7 +1,7 @@
-主软件为ApacheAirflow2.10.5。Windows11主机通过WSL2运行官方支持的Linux环境，不能写成原生Windows运行。
+操作系统： Windows11加WSL2。
 
-安装阶段可以联网取得主软件和锁定依赖，正式复现只读取题目输入并使用本机回环连接。辅助工具为PowerShell、Git和文本编辑器；公开仓库不包含凭据，许可按各软件原许可执行。
+主软件为ApacheAirflow2.10.5，在WSL2的Ubuntu24.04中运行。Airflow使用SQLite元数据库和SequentialExecutor，DAG加载、元数据库迁移、运行状态更新及暂停状态查询均由Airflow完成。
 
-建议准备2核CPU、4GB内存和2GB可用磁盘。权限限制为输入目录只读，程序只能写入指定工作目录；单次执行超时为15分钟，人工完成预计4至8小时。
+Python3.11用于运行Airflow和审计入口，PowerShell7用于从Windows调用WSL2。处理过程使用CPU，GPU可保持空闲；磁盘需要容纳Airflow环境、元数据库、日志和交付目录。数据库迁移和时间线处理分别设置超时，出现锁等待或DAG导入错误时终止当前处理。
 
-主要风险是复用旧元数据库造成隐藏DagRun、把owner=scheduler误解为已启动Scheduler、在解封时清除失败历史，或让CSV结果替代Airflow表记录；
+输入目录保持只读，交付目录需要写入SQLite数据库之外的DAG、CSV、JSON和Markdown文件。执行账号需要创建和迁移Airflow元数据库，并读写DagRun、DagModel和Log对应对象。

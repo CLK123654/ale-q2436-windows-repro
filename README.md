@@ -1,5 +1,3 @@
-# ALE题目2436的Windows复现
+#ale-q2436-windows-repro
 
-本仓库只包含题目2436的脱敏或虚构材料。主软件为Apache Airflow。工作流固定使用windows-2025，先核对四个附件哈希，再在两个独立目录展开输入和Reference，并调用主软件执行本地检查。
-
-当前仓库是独立验证载体，不包含飞书令牌、附件下载地址或原始备份。
+本仓库只包含Q2436的内容审核Feed连续失败保护交接材料。主软件为ApacheAirflow，正式运行边界是Windows11主机加WSL2和Ubuntu24.04。

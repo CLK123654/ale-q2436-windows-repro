@@ -1,4 +1,16 @@
-总分100分
+﻿题目ID,学科一级分类,学科二级分类,题目难度,任务概要,涉及的专业软件,包含的操作类型,任务prompt‼️,输入数据包（压缩包）‼️,reference（压缩包）‼️,关键标准答案‼️,关键动作,评分表（直接输入内容或使用txt文档）‼️,本项任务的环境依赖,相关专业软件的关键步骤,任务规格转化（excel或txt文档）,初标是否已完成,生产专家,完成日期
+,"Computing, Data & Mathematical Sciences 计算、数据与数学科学",基础设施工程与云运维,高,审核结果发布DAG的连续失败保护被关闭，管理员解封后也缺少完整的运行状态记录。平台工程师需要恢复Airflow暂停策略，按历史时间线核对自动暂停与解封状态，并交付修复后的DAG和发布审计材料。,Apache Airflow,领域专业软件操作、文件和数据处理、脚本/命令/程序化处理、结果验证,"内容平台每天通过moderation_feed_publish_guard发布审核结果。最近一次脚本调整关闭了连续失败保护，发布保障组需要在下个发布窗口前恢复这项控制，并核对两次管理员解封是否保留了失败历史。
+
+请使用输入包中的暂停策略、历史运行时间线和当前DAG完成交接。先恢复DAG的失败阈值，保留原有调度方式和任务关系；再把时间线中的运行写入新的Airflow元数据库，按顺序记录自动暂停、管理员解封和后续成功运行带来的状态变化。
+
+审计材料应能说明每个事件后的连续失败数和暂停状态，运行历史必须与输入一致。若某次解封后没有成功运行，下一次失败仍应沿用此前的失败后缀。成功运行出现后，连续失败数重新开始计算。
+
+交付output目录，其中dags保存修复后的DAG，tools保存审计入口，results保存事件台账、DagRun历史、DAG状态和暂停记录，HANDOVER.md说明发布前的核对结果。",输入数据包.zip,reference.zip,关键标准答案.xlsx,"核对暂停策略、事件时间线和当前DAG，确认阈值关闭的位置及原有任务关系。
+在修复版DAG中恢复连续失败阈值，保留调度方式、并发限制和任务依赖。
+初始化新的Airflow元数据库并同步修复版DAG。
+按sequence处理历史运行和管理员解封，保留run_id、logical_date与终态。
+从Airflow元数据库读取DagRun历史、暂停状态和暂停事件，整理逐事件状态台账。
+核对解封后的失败后缀与成功后的归零行为，形成发布交接说明。","总分100分
 
 1. 交付结构
 分值：8分
@@ -94,4 +106,15 @@
 客观硬性标准：文中引用的交付物全部存在，运行边界表述准确。
 阈值：四类信息齐全。
 优先级：辅助项
-所属层级：L1任务指令遵循层
+所属层级：L1任务指令遵循层","操作系统： Windows11加WSL2。
+
+主软件为ApacheAirflow2.10.5，在WSL2的Ubuntu24.04中运行。Airflow使用SQLite元数据库和SequentialExecutor，DAG加载、元数据库迁移、运行状态更新及暂停状态查询均由Airflow完成。
+
+Python3.11用于运行Airflow和审计入口，PowerShell7用于从Windows调用WSL2。处理过程使用CPU，GPU可保持空闲；磁盘需要容纳Airflow环境、元数据库、日志和交付目录。数据库迁移和时间线处理分别设置超时，出现锁等待或DAG导入错误时终止当前处理。
+
+输入目录保持只读，交付目录需要写入SQLite数据库之外的DAG、CSV、JSON和Markdown文件。执行账号需要创建和迁移Airflow元数据库，并读写DagRun、DagModel和Log对应对象。","1.使用DagBag加载当前DAG，核对dag_id、调度方式、并发限制和任务依赖。
+2.按pause_policy.json恢复max_consecutive_failed_dag_runs，并再次用DagBag确认配置。
+3.设置新的AIRFLOW_HOME，执行airflow db migrate，再将修复版DAG同步到元数据库。
+4.按sequence创建manual DagRun并写入输入终态，管理员事件只更新DagModel的暂停开关。
+5.每个运行状态确定后调用DagRun.update_state，让Airflow执行连续失败判断，再查询DagModel和Log记录状态变化。
+6.导出event_ledger.csv、dagrun_history.csv、dag_snapshot.json和pause_events.csv，并生成HANDOVER.md。",任务规格转化.xlsx,否,,
