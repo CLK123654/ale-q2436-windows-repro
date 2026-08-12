@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "skill": "humanizer-zh",
+  "result": "PASS",
+  "reviewed_scopes": [
+    "任务名称",
+    "任务概要",
+    "任务prompt",
+    "关键动作",
+    "评分表",
+    "环境依赖",
+    "软件步骤",
+    "输入材料中的自然语言",
+    "Reference中的用户可见文字",
+    "关键标准答案工作簿全部自然语言",
+    "任务规格工作簿全部自然语言"
+  ],
+  "scores": {
+    "直接性": 10,
+    "节奏": 9,
+    "信任度": 9,
+    "真实性": 9,
+    "精炼度": 9,
+    "total": 46
+  },
+  "minimum_total": 45,
+  "notes": [
+    "题面以发布保障组的交接需求切入，工作关系和发布时间明确。",
+    "删除固定测试矩阵、双空库、判卷器和复现流程文案。",
+    "不再把Airflow私有方法名或固定Log展示字段写成业务要求。",
+    "暂停结论绑定DagRun、DagModel和Log中的可观察状态，解封与失败后缀形成闭环。",
+    "任务规格逐项围绕Airflow对象、元数据库行为和交付结果设计。"
+  ],
+  "reviewed_artifacts_sha256": {
+    "ALE-专家数据作业表_q2436.csv": "94e42cc5baada457085ad798847583eeea983e0f6b68652bd7c0e5138e5f0ce5",
+    "reference.zip": "023606fe4b7392bf9121a35dab30365a6207f6fbaba9e5000317f23b5b41a082",
+    "task_fields.json": "dd9b09ab8b6932116ca9ef58fbd2183f8a0e1a7b7cb1644aafcf01aad1f421a2",
+    "任务prompt.txt": "49e29462f6e30a22a573d1f364c105c35058406a681ecae94529fcd9f5e09841",
+    "任务名称.txt": "eeb54fc2461980478afcbd77a9aa41e9bd35607ad628ee6648f6fa86a3ac1ba8",
+    "任务概要.txt": "45a845fb5624a220367eb3181589a1f8e83bdf9bc095330487ad792567e440a9",
+    "任务规格转化.xlsx": "ff2ea71a5567df2c3bbab52b4624888ef3c45dc56faf32ed22c16beb0a505979",
+    "关键动作.txt": "b953f308eedc5bdc12bfd5ac64eb3c79cf7d8dbb42cdb1a7165c8901fa3ec0ea",
+    "关键标准答案.xlsx": "1d555bd64d024a02c0f5ebfd548210fc7df6fa92e783cbc71af55084b991fcfd",
+    "环境依赖.txt": "6615c3f91a252be3baa564791da3203912f08e55f17d155f69adcf3d24f79617",
+    "相关专业软件的关键步骤.txt": "28ba44005adcd0e1cc38c3cd9e423ad4a2a699729c7506c9cc6fd9d0e79c330d",
+    "评分表.txt": "998f82554544bc4e8ae51c3e28e73e53bdbcac47f22565f39fdbf685d8dfb56f",
+    "输入数据包.zip": "ebbbb36a051483d4a9d68bb0c634b425c15425ad7c5067cdd4b6bd757b7af7a1"
+  }
+}
