@@ -4,6 +4,7 @@ import hashlib
 import importlib.metadata
 import json
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -115,6 +116,11 @@ def main() -> None:
     summary = {
         "result": "PASS", "commit_sha": os.getenv("GITHUB_SHA"), "workflow_run_id": os.getenv("GITHUB_RUN_ID"),
         "runner_image": os.getenv("ImageOS"),
+        "wsl_runtime": {
+            "distribution": "Ubuntu24.04",
+            "kernel": platform.release(),
+            "architecture": platform.machine(),
+        },
         "main_software": {"name": "Apache Airflow", "version": importlib.metadata.version("apache-airflow"), "executed": True, "runtime_boundary": "Windows2025+WSL2+Ubuntu24.04"},
         "clean_directory_count": 2, "process_runs_per_directory": 2, "clean_runs": clean_runs,
         "positive_mutation": "PASS", "negative_case": "PASS", "reference_full_comparison": "PASS",
