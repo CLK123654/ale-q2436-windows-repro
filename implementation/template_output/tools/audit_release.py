@@ -37,7 +37,7 @@ def write_csv(path: Path, fields: list[str], rows: list[dict]) -> None:
 
 
 def task_graph(dag: DAG) -> tuple[list[str], list[list[str]]]:
-    tasks = sorted(dag.task_ids)
+    tasks = [task.task_id for task in dag.tasks]
     edges = sorted(
         [task.task_id, downstream]
         for task in dag.tasks
